@@ -15,7 +15,12 @@ namespace CastleGrimtol.Project.Models
       Name = name;
       Description = desc;
       Items = new List<Item>();
-      Exits = new Dictionary<string, IRoom>():
+      Exits = new Dictionary<string, IRoom>();
+    }
+
+    public Room moveRoom()
+    {
+      return null;
     }
   }
 }
