@@ -13,15 +13,12 @@ namespace CastleGrimtol.Project
     public void GetUserInput()
     {
 
-
       Console.WriteLine("What would you like to do?");
       string userInput = Console.ReadLine().ToLower();
       string[] inputArr = userInput.Split(" ");
       string command = inputArr[0];
 
       string value;
-
-
 
       // if(value != null){
       //   Go(value);
@@ -30,15 +27,16 @@ namespace CastleGrimtol.Project
       switch (command)
       {
         case "look":
-          Console.Clear();
           Look();
           break;
         case "inventory":
-          Console.Clear();
           Inventory();
           break;
         case "reset":
           Reset();
+          break;
+        case "quit":
+          Quit();
           break;
         case "go":
           if (inputArr.Length > 1)
@@ -68,19 +66,28 @@ namespace CastleGrimtol.Project
 
     public void Go(string direction)
     {
+      Console.Clear();
       Console.WriteLine($"You're trying to go {direction}");
       if (CurrentRoom.Name == "Top of A Mountain" && !CurrentRoom.Exits.ContainsKey(direction))
       {
-        Playing = false;
-        Console.WriteLine("OOP! You can't go that way");
+        // Console.WriteLine("OOP! You can't go that way");
         Console.WriteLine("Ruh roh! You fell off the mountain!");
-        return;
+        Console.WriteLine("Wow you climbed really fast!");
+        Setup();
       }
       if (CurrentRoom.Exits.ContainsKey(direction))
       {
         CurrentRoom = CurrentRoom.Exits[direction];
-        // if thcze current room is the mtn and you got the boat you drop it yo
-        Look();
+        if (CurrentRoom.Name == "Top of A Mountain" && CurrentPlayer.Inventory.Count > 0)
+        {
+          Item boat = CurrentPlayer.Inventory.Find(i =>
+          {
+            return i.Name.ToLower() == "boat";
+          });
+          CurrentPlayer.Inventory.Remove(boat);
+          CurrentRoom.Exits["west"].Exits["north"].Items.Add(boat);
+          Console.WriteLine("Hiking back up, you dropped your boat!");
+        }
       }
       else
       {
@@ -103,11 +110,9 @@ namespace CastleGrimtol.Project
       {
         CurrentPlayer.Inventory.ForEach(i =>
         {
-          Console.WriteLine($"{i} is in your inventory");
+          Console.WriteLine($"{i.Name} is in your inventory");
         });
       }
-      // Console.WriteLine(CurrentPlayer.Inventory);
-      //iterate over the Inventory lists
       System.Console.WriteLine("Press Enter to Continue");
       Console.ReadLine();
     }
@@ -120,12 +125,25 @@ namespace CastleGrimtol.Project
     public void Quit()
     {
       Playing = false;
-      Console.WriteLine("Would you like to play again?");
+      Console.WriteLine("Would you like to play again? y/n");
+      ConsoleKeyInfo res = Console.ReadKey();
+      if (res.KeyChar == 'y')
+      {
+        Setup();
+        GetUserInput();
+      }
+      else if (res.KeyChar == 'n')
+      {
+        Console.WriteLine("KBYEEEE!");
+        Console.ReadLine();
+      }
     }
 
     public void Reset()
     {
       Console.Clear();
+      Setup();
+      StartGame();
     }
 
     public void Setup()
@@ -162,25 +180,27 @@ namespace CastleGrimtol.Project
     {
       while (Playing)
       {
-        Console.Clear();
         IRoom curRoom = CurrentRoom;
-        Console.WriteLine($"You are currently at {curRoom.Name}. {curRoom.Description}");
+        Console.WriteLine($"You are currently at {curRoom.Name}.");
+        Look();
         GetUserInput();
       }
     }
 
     public void TakeItem(string itemName)
     {
-      GetUserInput();
+
       Item item = CurrentRoom.Items.Find(i =>
       {
-        return i.Name == itemName;
+
+        return i.Name.ToLower() == itemName;
       });
 
       if (item != null)
       {
         CurrentRoom.Items.Remove(item);
         CurrentPlayer.Inventory.Add(item);
+        System.Console.WriteLine(@"You have the boat.");
       }
       else
       {
