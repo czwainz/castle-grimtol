@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CastleGrimtol.Project.Interfaces;
 
@@ -18,9 +19,9 @@ namespace CastleGrimtol.Project.Models
       Exits = new Dictionary<string, IRoom>();
     }
 
-    public Room moveRoom()
+    public void ValidateRoom(string direction)
     {
-      return null;
+      Console.WriteLine("Using room");
     }
   }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using CastleGrimtol.Project;
 using CastleGrimtol.Project.Interfaces;
+using CastleGrimtol.Project.Models;
 
 namespace CastleGrimtol
 {
@@ -13,11 +14,12 @@ namespace CastleGrimtol
       //do you want to play?
       //create an instance of gameservice and run startgame or setup
       Console.Write("Please enter your name: ");
+      GameService gs = new GameService();
+      gs.Setup();
       string playerName = Console.ReadLine();
-      GameService gm = new GameService();
-      gm.Setup();
-      IRoom curRoom = gm.CurrentRoom;
-      Console.WriteLine($"Hello {playerName}! You are at {curRoom.Name}");
+      Console.WriteLine($"Hello {playerName}!");
+
+      gs.StartGame();
 
 
     }

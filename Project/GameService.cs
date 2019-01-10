@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CastleGrimtol.Project.Interfaces;
 using CastleGrimtol.Project.Models;
@@ -11,12 +12,34 @@ namespace CastleGrimtol.Project
 
     public void GetUserInput()
     {
-      throw new System.NotImplementedException();
+      IRoom curRoom = CurrentRoom;
+
+      Console.Clear();
+      Console.WriteLine($"You are currently at {curRoom.Name}.");
+      Console.WriteLine("What would you like to do?");
+      string userInput = Console.ReadLine().ToLower();
+      string[] command = userInput.Split(" ");
+
+      switch (command[0])
+      {
+        case "look":
+          Console.Clear();
+          Look();
+          break;
+        case "inventory":
+          Console.Clear();
+          Inventory();
+          break;
+        case "go":
+          Go(command[1]);
+          break;
+      }
+
     }
 
     public void Go(string direction)
     {
-      throw new System.NotImplementedException();
+      Console.WriteLine($"You're trying to go {direction}");
     }
 
     public void Help()
@@ -26,12 +49,12 @@ namespace CastleGrimtol.Project
 
     public void Inventory()
     {
-      throw new System.NotImplementedException();
+      Console.WriteLine(CurrentPlayer.Inventory);
     }
 
     public void Look()
     {
-      throw new System.NotImplementedException();
+      Console.WriteLine(CurrentRoom.Description);
     }
 
     public void Quit()
@@ -41,7 +64,7 @@ namespace CastleGrimtol.Project
 
     public void Reset()
     {
-      throw new System.NotImplementedException();
+
     }
 
     public void Setup()
@@ -72,7 +95,8 @@ namespace CastleGrimtol.Project
 
     public void StartGame()
     {
-      throw new System.NotImplementedException();
+      Setup();
+      GetUserInput();
     }
 
     public void TakeItem(string itemName)
