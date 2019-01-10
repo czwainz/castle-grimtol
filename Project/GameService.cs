@@ -22,10 +22,8 @@ namespace CastleGrimtol.Project
       string command = inputArr[0];
 
       string value;
-      if (inputArr.Length > 1)
-      {
-        value = inputArr[1];
-      }
+
+
 
       // if(value != null){
       //   Go(value);
@@ -42,7 +40,15 @@ namespace CastleGrimtol.Project
           Inventory();
           break;
         case "go":
-          Go(value);
+          if (inputArr.Length > 1)
+          {
+            value = inputArr[1];
+            Go(value);
+          }
+          else
+          {
+            Console.WriteLine("Not a valid direction, mate");
+          }
           break;
       }
 
@@ -51,6 +57,15 @@ namespace CastleGrimtol.Project
     public void Go(string direction)
     {
       Console.WriteLine($"You're trying to go {direction}");
+      if (CurrentRoom.Exits.ContainsKey(direction))
+      {
+        CurrentRoom = CurrentRoom.Exits[direction];
+        Look();
+      }
+      else
+      {
+        Console.WriteLine("You can't go that way");
+      }
     }
 
     public void Help()
@@ -60,6 +75,10 @@ namespace CastleGrimtol.Project
 
     public void Inventory()
     {
+      if (CurrentPlayer.Inventory == null)
+      {
+        Console.WriteLine("You don't have any items");
+      }
       Console.WriteLine(CurrentPlayer.Inventory);
     }
 
