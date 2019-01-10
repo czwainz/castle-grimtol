@@ -18,9 +18,20 @@ namespace CastleGrimtol.Project
       Console.WriteLine($"You are currently at {curRoom.Name}.");
       Console.WriteLine("What would you like to do?");
       string userInput = Console.ReadLine().ToLower();
-      string[] command = userInput.Split(" ");
+      string[] inputArr = userInput.Split(" ");
+      string command = inputArr[0];
 
-      switch (command[0])
+      string value;
+      if (inputArr.Length > 1)
+      {
+        value = inputArr[1];
+      }
+
+      // if(value != null){
+      //   Go(value);
+      // }
+
+      switch (command)
       {
         case "look":
           Console.Clear();
@@ -31,7 +42,7 @@ namespace CastleGrimtol.Project
           Inventory();
           break;
         case "go":
-          Go(command[1]);
+          Go(value);
           break;
       }
 
