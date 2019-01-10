@@ -14,11 +14,13 @@ namespace CastleGrimtol
       //do you want to play?
       //create an instance of gameservice and run startgame or setup
       Console.Write("Please enter your name: ");
-      GameService gs = new GameService();
-      gs.Setup();
       string playerName = Console.ReadLine();
+      Player playa = new Player(playerName);
+      GameService gs = new GameService(playa);
       Console.WriteLine($"Hello {playerName}!");
 
+
+      gs.Setup();
       gs.StartGame();
 
 
