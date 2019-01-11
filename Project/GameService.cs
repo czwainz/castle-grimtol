@@ -10,10 +10,11 @@ namespace CastleGrimtol.Project
     public IRoom CurrentRoom { get; set; }
     public Player CurrentPlayer { get; set; }
     public bool Playing { get; private set; }
+
     public void GetUserInput()
     {
 
-      Console.WriteLine("What would you like to do?");
+      Console.Write("What would you like to do? ");
       string userInput = Console.ReadLine().ToLower();
       string[] inputArr = userInput.Split(" ");
       string command = inputArr[0];
@@ -60,6 +61,21 @@ namespace CastleGrimtol.Project
             Console.WriteLine("Nothing to take, mate");
           }
           break;
+        case "use":
+          if (inputArr.Length > 1)
+          {
+            value = inputArr[1];
+            UseItem(value);
+          }
+          else
+          {
+            Console.WriteLine("Nothing to use, mate");
+          }
+          break;
+        case "help":
+          Help();
+          break;
+
       }
 
     }
@@ -72,8 +88,7 @@ namespace CastleGrimtol.Project
       {
         // Console.WriteLine("OOP! You can't go that way");
         Console.WriteLine("Ruh roh! You fell off the mountain!");
-        Console.WriteLine("Wow you climbed really fast!");
-        Setup();
+        Quit();
       }
       if (CurrentRoom.Exits.ContainsKey(direction))
       {
@@ -93,11 +108,21 @@ namespace CastleGrimtol.Project
       {
         Console.WriteLine("OOP! You can't go that way");
       }
+      Look();
     }
 
     public void Help()
     {
-      throw new System.NotImplementedException();
+      Console.Clear();
+      Console.WriteLine(@"Here are you options! 
+       go - choose a direction to move 
+       take - any items that are in the room 
+       use - any items in your inventory 
+       look - check what room you're in  
+       inventory - check your inventory
+       quit - allows you to exit the game
+       reset - sends you back to the top of the mountain");
+      GetUserInput();
     }
 
     public void Inventory()
@@ -119,7 +144,7 @@ namespace CastleGrimtol.Project
 
     public void Look()
     {
-      Console.WriteLine(CurrentRoom.Description);
+      Console.WriteLine($"{CurrentRoom.Description}");
     }
 
     public void Quit()
@@ -130,12 +155,19 @@ namespace CastleGrimtol.Project
       if (res.KeyChar == 'y')
       {
         Setup();
-        GetUserInput();
+        Playing = true;
+        StartGame();
       }
       else if (res.KeyChar == 'n')
       {
         Console.WriteLine("KBYEEEE!");
         Console.ReadLine();
+      }
+      else
+      {
+        Console.WriteLine("Enter y or n!");
+        Console.ReadLine();
+        Quit();
       }
     }
 
@@ -143,6 +175,7 @@ namespace CastleGrimtol.Project
     {
       Console.Clear();
       Setup();
+      Playing = true;
       StartGame();
     }
 
@@ -153,7 +186,7 @@ namespace CastleGrimtol.Project
       Room tunnel = new Room("Tunnel", "Down de tunnel! ");
       Room water = new Room("Water", "AH! YOU'RE SWIMMING! TRUFFLE SHUFFLE!"); //need to use boat to get to treasure
       Room hole = new Room("Hole", "You've entered a hole. But wait, there's boat. Neat!");
-      Room treasure = new Room("Treasure Chest", "Excellente! You've got the bounty matey!");
+
 
       Item boat = new Item("Boat", "Hope this helps float ya to the treasure");
       hole.Items.Add(boat);
@@ -170,7 +203,7 @@ namespace CastleGrimtol.Project
       tunnel.Exits.Add("west", water);
       tunnel.Exits.Add("north", cave);
 
-      water.Exits.Add("north", treasure); //would like to make the exit to treasure a randomly generated exit, ALSO must use boat to get to treasure
+      ; //would like to make the exit to treasure a randomly generated exit, ALSO must use boat to get to treasure
       water.Exits.Add("east", tunnel);
 
       CurrentRoom = mountain;
@@ -178,11 +211,11 @@ namespace CastleGrimtol.Project
 
     public void StartGame()
     {
+      Look();
       while (Playing)
       {
         IRoom curRoom = CurrentRoom;
         Console.WriteLine($"You are currently at {curRoom.Name}.");
-        Look();
         GetUserInput();
       }
     }
@@ -192,7 +225,6 @@ namespace CastleGrimtol.Project
 
       Item item = CurrentRoom.Items.Find(i =>
       {
-
         return i.Name.ToLower() == itemName;
       });
 
@@ -200,18 +232,70 @@ namespace CastleGrimtol.Project
       {
         CurrentRoom.Items.Remove(item);
         CurrentPlayer.Inventory.Add(item);
-        System.Console.WriteLine(@"You have the boat.");
+        Console.WriteLine($"You have {item.Name}.");
       }
       else
       {
-        Console.WriteLine("There is nothing to take");
+        Console.WriteLine("There is nothing to take!");
       }
     }
 
     public void UseItem(string itemName)
     {
-      throw new System.NotImplementedException();
+      string[] winDirs = { "north", "south", "west" };
+      Random rnd = new Random();
+      string treasure = winDirs[rnd.Next(0, 3)];
+      string hint = winDirs[rnd.Next(0, 3)];
+
+      if (CurrentRoom.Name == "Water" && CurrentPlayer.Inventory[0].Name == "Boat" && itemName.ToLower() == "boat")
+      {
+        Console.WriteLine("Yay you can use the boat! What direction?");
+        Console.WriteLine($"There's a glimmer of light to the {hint}.");
+        string chosenDir = Console.ReadLine();
+        string splitDir;
+        //         string userInput = Console.ReadLine().ToLower();
+        // string[] inputArr = userInput.Split(" ");
+        // string command = inputArr[0];
+        //split on spaces and check length
+
+        string[] inputDir = chosenDir.Split(" ");
+        if (inputDir.Length >= 2)
+        {
+          splitDir = inputDir[1];
+        }
+        else
+        {
+          splitDir = inputDir[0];
+        }
+
+        string treasureDir = treasure;
+        if (splitDir == treasureDir)
+        {
+          Console.WriteLine("YOU JUAN! Excellente! You've got the bounty matey!");
+          Quit();
+        }
+        else
+        {
+          System.Console.WriteLine("Wrong direction!");
+          CurrentRoom = CurrentRoom.Exits["east"].Exits["north"];
+        }
+
+      }
+      else if (CurrentRoom.Name != "Water" && CurrentPlayer.Inventory[0].Name == "Boat" && itemName.ToLower() == "boat")
+      {
+        Console.WriteLine($"Neat you have the {itemName}, but you're in the wrong room");
+      }
+      else if (CurrentRoom.Name == "Water" && CurrentPlayer.Inventory[0].Name != "Boat" && itemName.ToLower() == "boat")
+      {
+        Console.WriteLine("You're in the right place, but you don't have the stuff");
+      }
+      else
+      {
+        System.Console.WriteLine($"Cannot use {itemName}. Bummer dude!");
+      }
+
     }
+
     public GameService(Player currPlayer)
     {
       CurrentPlayer = currPlayer;
